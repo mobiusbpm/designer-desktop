@@ -1,0 +1,141 @@
+{
+  "name": "mobius-designer",
+  "productName": "Mobius Designer",
+  "version": "0.0.1",
+  "main": "app.js",
+  "author": {
+    "name": "mobius",
+    "email": "mobius.bpm@gmail.com"
+  },
+  "scripts": {
+    "ng": "ng",
+    "start": "ng build --base-href ./ && electron .",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "serve:ssr:ang-electron": "node dist/mobius-designer-desktop/server/server.mjs",
+    "dist": "ng build --base-href ./ && electron-builder",
+    "dist:mac": "ng build --base-href ./ && electron-builder --mac",
+    "dist:win": "ng build --base-href ./ && electron-builder --win",
+    "dist:linux": "ng build --base-href ./ && electron-builder --linux",
+    "dist:all": "ng build --base-href ./ && electron-builder --mac --win --linux"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^17.3.0",
+    "@angular/common": "^17.3.0",
+    "@angular/compiler": "^17.3.0",
+    "@angular/core": "^17.3.0",
+    "@angular/forms": "^17.3.0",
+    "@angular/platform-browser": "^17.3.0",
+    "@angular/platform-browser-dynamic": "^17.3.0",
+    "@angular/router": "^17.3.0",
+    "@bpmn-io/properties-panel": "^3.25.1",
+    "bpmn-js": "^18.1.2",
+    "bpmn-js-properties-panel": "^5.30.0",
+    "diagram-js": "^15.2.4",
+    "ids": "^1.0.5",
+    "lokijs": "^1.5.12",
+    "ng-zorro-antd": "^17.4.1",
+    "pdf-lib": "^1.17.1",
+    "rxjs": "~7.8.0",
+    "sharp": "^0.34.3",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.14.3"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^17.3.0",
+    "@angular/cli": "^17.3.8",
+    "@angular/compiler-cli": "^17.3.0",
+    "@angular/localize": "^17.3.12",
+    "@types/jasmine": "~5.1.0",
+    "@types/node": "^22.10.2",
+    "electron": "^33.2.1",
+    "electron-builder": "^26.0.12",
+    "jasmine-core": "~5.1.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "typescript": "~5.4.2"
+  },
+  "build": {
+    "appId": "com.mobiusdesigner.app",
+    "productName": "Mobius Designer",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/mobius-designer-desktop/**/*",
+      "app.js",
+      "preload.js",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "extraFiles": [
+      {
+        "from": "metadata.db",
+        "to": "metadata.db"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "src/assets/icon-png.png",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "icon": "src/assets/icon-png.png",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "icon": "src/assets/icon-png.png",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "tar.gz",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

@@ -1,0 +1,71 @@
+.properties-panel {
+  position: relative;
+  width: 350px;
+  border: 1px solid #ddd;
+  //border-top: 1px solid #ddd;
+  position-right: 0;
+  transition: width 0.3s ease; /* Smooth animation for width change */
+}
+
+.drag-handle {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  z-index: 100;
+  width: 1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drawer-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.centered-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.app-edit-tools {
+  width: 400px; /* Set a fixed width for the app-edit-tools component */
+}
+
+.breadcrumb-container {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  flex: 1; /* Allow the breadcrumb-container to take the remaining space */
+}
+
+.breadcrumb-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: start;
+}
+
+.breadcrumb-wrapper a {
+  text-decoration-color: #333;
+  text-decoration: underline;
+}
+
+.breadcrumb-wrapper a hover{
+  text-decoration-color: #1890ff;
+  text-decoration: none;
+}
+
+.file-path {
+  font-size: 14px;
+  color: #333;
+  margin: 0 10px 10px 0;
+  white-space: nowrap;
+}
+
+.djs-popup.color-picker .entry {
+  margin: 0;
+}
+

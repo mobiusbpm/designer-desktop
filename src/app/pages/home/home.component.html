@@ -1,0 +1,19 @@
+<nz-row nzJustify="space-around" nzAlign="middle">
+  <nz-col class="home-left-image" nzSpan="12" rowspan="3">
+    <img ngSrc="assets/home_left.png" height="310" width="310">
+  </nz-col>
+  <nz-col class="home-right-col">
+    <nz-row>
+        <h2 i18n="@@home_welcome">Welcome to the BPMN Editor</h2>
+    </nz-row>
+    <nz-row class=".home-right-button-row">
+      <nz-col>
+        <p><label i18n="@@home_create_new">Create a new file&nbsp;&nbsp;</label></p>
+        <p><label i18n="@@home_import_file">Open an existing file&nbsp;&nbsp;</label></p>
+      </nz-col>
+      <nz-col>
+        <p><button style="width: 150px" (click)="newDiagram()">New Diagram</button></p>
+        <p><button style="width: 150px" (click)="import()">Browse and Open</button></p>
+      </nz-col>    </nz-row>
+  </nz-col>
+</nz-row>
