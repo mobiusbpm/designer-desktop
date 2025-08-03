@@ -387,6 +387,28 @@ export class DesignerUiComponent implements OnInit, AfterViewInit {
     });
   }
 
+  handleDownloadPdf() {
+    this.modeler.saveSVG({format: true}).then((result: any) => {
+      const {svg} = result;
+      let fileName = this.getFileName();
+      if (fileName) {
+        fileName = fileName.substring(0, fileName!.indexOf('.'));
+      }
+      let data = {"svg": svg, "fileName": fileName};
+      this.electronService.exportAsPdf(data).then((res) => {
+        if (res.success) {
+          if (!res.canceled) {
+            this.messageService.success(res.message);
+          }
+        } else {
+          this.messageService.error(res.error);
+        }
+      });
+    }).catch(function (err: any) {
+      console.error('Error happens when downloading PDF', err);
+    });
+  }
+
   copyFile() {
     // get the element the current pointer selected
     const selection = this.modeler.get('selection');

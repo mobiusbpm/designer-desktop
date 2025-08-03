@@ -36,6 +36,10 @@ let bridge_exportAs = async (data) => {
   return await ipcRenderer.invoke('export-as', data);
 }
 
+let bridge_exportAsPdf = async (data) => {
+  return await ipcRenderer.invoke('export-as-pdf', data);
+}
+
 let bridge_saveChanges = async (path, xml) => {
   return await ipcRenderer.invoke('save-changes', path, xml);
 }
@@ -86,6 +90,7 @@ let apis = {
   downloadProcess: bridge_downloadProcess,
   downloadSvg: bridge_downloadSvg,
   exportAs: bridge_exportAs,
+  exportAsPdf: bridge_exportAsPdf,
   saveChanges: bridge_saveChanges,
   copyFile: bridge_copyFile,
   updateWindowTitle: bridge_updateWindowTitle,

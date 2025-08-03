@@ -21,6 +21,7 @@ export class EditToolsComponent {
   @Output() onSave = new EventEmitter();
   @Output() onDownloadXml = new EventEmitter();
   @Output() onDownloadSvg = new EventEmitter();
+  @Output() onDownloadPdf = new EventEmitter();
   @Output() onPublish = new EventEmitter();
   @Output() onImport = new EventEmitter();
   @Output() onDuplicate = new EventEmitter();
@@ -68,5 +69,9 @@ export class EditToolsComponent {
 
   _onDuplicate() {
     this.onDuplicate.emit();
+  }
+
+  _onDownloadPdf() {
+    this.onDownloadPdf.emit();
   }
 }

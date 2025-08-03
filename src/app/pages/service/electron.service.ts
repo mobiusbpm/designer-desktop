@@ -23,6 +23,10 @@ export class ElectronService {
     return (window as any).electronAPI.exportAs(data);
   }
 
+  exportAsPdf(data: any): Promise<any> {
+    return (window as any).electronAPI.exportAsPdf(data);
+  }
+
   saveChanges(path: string, xml: string): Promise<any> {
     return (window as any).electronAPI.saveChanges(path, xml);
   }

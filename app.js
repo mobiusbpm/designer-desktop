@@ -550,6 +550,31 @@ ipcMain.handle('export-as', async (event, data) => {
   }
 });
 
+ipcMain.handle('export-as-pdf', async (event, data) => {
+  const fileName = data['fileName'] || 'diagram';
+  const svg = data['svg'];
+  const filePath = await dialog.showSaveDialog({
+    title: 'Export as PDF',
+    defaultPath: fileName + '.pdf',
+    filters: [
+      {name: 'PDF Files', extensions: ['pdf']}
+    ],
+  });
+
+  if (filePath.canceled) {
+    return {success: true, canceled: true, message: 'Canceled!'};
+  }
+
+  try {
+    const buffer = Buffer.from(svg);
+    await exportAsPDF(buffer, filePath.filePath);
+    return {success: true, canceled: false, message: 'PDF exported successfully'};
+  } catch (error) {
+    console.error('Error saving PDF file:', error);
+    return {success: false, message: 'Error saving PDF file', error: error.message};
+  }
+});
+
 ipcMain.handle('copy-file', (event, json) => {
   clipboard.writeText(json);
   return {success: true, message: 'Copied to clipboard'};
