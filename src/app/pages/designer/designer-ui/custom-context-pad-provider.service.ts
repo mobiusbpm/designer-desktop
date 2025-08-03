@@ -40,21 +40,29 @@ export class CustomContextPadProvider {
     try {
       // Check if this is a text annotation
       if (element.type === 'bpmn:TextAnnotation') {
-        // Text annotations don't support fill color, only stroke and text styling
+        console.log('Applying color to text annotation:', element.id, color);
+        
+        // For text annotations, set stroke color
         this.modeling.setColor(element, {
-          stroke: color,
-          fill: 'transparent'
+          stroke: color
         });
+        
+        // Also try to directly manipulate the SVG for better visibility
+        this.enhanceElementVisibility(element, color, 'stroke');
         return;
       }
       
       // Check if this is a group element
       if (element.type === 'bpmn:Group') {
-        // Groups typically only support stroke color, not fill
+        console.log('Applying color to group:', element.id, color);
+        
+        // For groups, set stroke color
         this.modeling.setColor(element, {
-          stroke: color,
-          fill: 'transparent'
+          stroke: color
         });
+        
+        // Enhance visibility for groups
+        this.enhanceElementVisibility(element, color, 'stroke');
         return;
       }
       
@@ -65,14 +73,78 @@ export class CustomContextPadProvider {
       });
     } catch (error) {
       console.warn('Unable to apply color to element:', element.type, error);
-      // Fallback: try just setting stroke color for problematic elements
+      // Enhanced fallback for problematic elements
       try {
+        // Try just setting stroke color
         this.modeling.setColor(element, {
           stroke: color
         });
+        
+        // Try to enhance visibility
+        this.enhanceElementVisibility(element, color, 'stroke');
       } catch (fallbackError) {
         console.error('Failed to apply color to element:', element.type, fallbackError);
       }
+    }
+  }
+
+  enhanceElementVisibility(element: any, color: string, type: 'stroke' | 'fill') {
+    try {
+      // Find the SVG element in the DOM
+      const elementId = element.id;
+      const svgElement = document.querySelector(`[data-element-id="${elementId}"]`);
+      
+      if (svgElement) {
+        if (element.type === 'bpmn:TextAnnotation') {
+          // For text annotations, only modify the existing visible border (left side)
+          // Don't add full border - just enhance the existing one
+          const visualElements = svgElement.querySelectorAll('path, polyline');
+          
+          visualElements.forEach((visual: any) => {
+            // Only modify if it's already visible (has stroke or stroke-width)
+            const currentStroke = visual.getAttribute('stroke') || visual.style.stroke;
+            const currentStrokeWidth = visual.getAttribute('stroke-width') || visual.style.strokeWidth;
+            
+            if (currentStroke && currentStroke !== 'none') {
+              visual.style.stroke = color;
+              visual.setAttribute('stroke', color);
+              // Slightly increase width for better visibility, but keep it subtle
+              if (currentStrokeWidth) {
+                const newWidth = Math.max(1.5, parseFloat(currentStrokeWidth) * 1.2);
+                visual.style.strokeWidth = newWidth + 'px';
+                visual.setAttribute('stroke-width', newWidth.toString());
+              }
+            }
+          });
+        } else {
+          // For other elements (like groups), apply full border styling
+          const visualElements = svgElement.querySelectorAll('path, rect, circle, ellipse, polygon, polyline');
+          
+          visualElements.forEach((visual: any) => {
+            if (type === 'stroke') {
+              visual.style.stroke = color;
+              visual.style.strokeWidth = element.type === 'bpmn:Group' ? '3px' : '2px';
+              visual.setAttribute('stroke', color);
+              visual.setAttribute('stroke-width', element.type === 'bpmn:Group' ? '3' : '2');
+              
+              // For groups, make them dashed for better visibility
+              if (element.type === 'bpmn:Group') {
+                visual.style.strokeDasharray = '5,5';
+                visual.setAttribute('stroke-dasharray', '5,5');
+              }
+            } else {
+              visual.style.fill = color;
+              visual.setAttribute('fill', color);
+            }
+          });
+        }
+        
+        console.log(`Enhanced visibility for ${element.type} with ${type}: ${color}`);
+      } else {
+        console.log(`Could not find SVG element for ${elementId}`);
+      }
+    } catch (error) {
+      console.log('Could not enhance element visibility:', error);
     }
   }
 
