@@ -37,18 +37,87 @@ export class CustomContextPadProvider {
   }
 
   applyColorToElement(element: any, color: string) {
-    this.modeling.setColor(element, {
-      fill: color,
-      stroke: 'black'
-    });
+    try {
+      // Check if this is a text annotation
+      if (element.type === 'bpmn:TextAnnotation') {
+        // Text annotations don't support fill color, only stroke and text styling
+        this.modeling.setColor(element, {
+          stroke: color,
+          fill: 'transparent'
+        });
+        return;
+      }
+      
+      // Check if this is a group element
+      if (element.type === 'bpmn:Group') {
+        // Groups typically only support stroke color, not fill
+        this.modeling.setColor(element, {
+          stroke: color,
+          fill: 'transparent'
+        });
+        return;
+      }
+      
+      // For other elements, apply both fill and stroke
+      this.modeling.setColor(element, {
+        fill: color,
+        stroke: 'black'
+      });
+    } catch (error) {
+      console.warn('Unable to apply color to element:', element.type, error);
+      // Fallback: try just setting stroke color for problematic elements
+      try {
+        this.modeling.setColor(element, {
+          stroke: color
+        });
+      } catch (fallbackError) {
+        console.error('Failed to apply color to element:', element.type, fallbackError);
+      }
+    }
   }
 
   getContextPadEntries(element: any) {
+    // Only show color picker for elements that support coloring
+    const colorableElements = [
+      'bpmn:Task',
+      'bpmn:UserTask',
+      'bpmn:ServiceTask',
+      'bpmn:ScriptTask',
+      'bpmn:BusinessRuleTask',
+      'bpmn:SendTask',
+      'bpmn:ReceiveTask',
+      'bpmn:ManualTask',
+      'bpmn:CallActivity',
+      'bpmn:SubProcess',
+      'bpmn:StartEvent',
+      'bpmn:EndEvent',
+      'bpmn:IntermediateThrowEvent',
+      'bpmn:IntermediateCatchEvent',
+      'bpmn:BoundaryEvent',
+      'bpmn:Gateway',
+      'bpmn:ExclusiveGateway',
+      'bpmn:InclusiveGateway',
+      'bpmn:ParallelGateway',
+      'bpmn:EventBasedGateway',
+      'bpmn:ComplexGateway',
+      'bpmn:DataObjectReference',
+      'bpmn:DataStoreReference',
+      'bpmn:Participant',
+      'bpmn:Lane',
+      'bpmn:TextAnnotation',
+      'bpmn:Group'
+    ];
+
+    // Check if the current element supports coloring
+    if (!colorableElements.includes(element.type)) {
+      return {};
+    }
+
     return {
       'color-picker': {
         group: 'edit', // which group (edit, model, etc.)
         className: 'bpmn-icon-color', // icon class name
-        title: 'Color Element', //this.translate('Color Element'),
+        title: 'Fill Color', //this.translate('Fill Color'),
         html: `<div class="entry">${colorPickerSvg}</div>`,
         action: {
           click: (event: any, element: any) => {
@@ -68,7 +137,7 @@ export class CustomContextPadProvider {
 
     // Define your 8 specific colors
     const colors = [
-      '#FFB6C1', '#FFFFC5', '#DAF7A6', '#f4a677',
+      '#f15b71ff', '#FFFFC5', '#DAF7A6', '#f4a677',
       '#b1d4e0', '#f0e3fe', '#b8f3d4', '#FFFFFF'
     ];
 
@@ -77,7 +146,7 @@ export class CustomContextPadProvider {
 
     panel.style.position = 'absolute';
     const rect = anchorEl.getBoundingClientRect();
-    panel.style.top = rect.bottom + 5 + 'px'; // 5px below
+    panel.style.top = rect.bottom + 5 + 'px';
     panel.style.left = rect.left + 'px';
     panel.style.background = '#fff';
     panel.style.border = '1px solid #ccc';
