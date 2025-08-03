@@ -87,6 +87,9 @@ electron-builder-effective-config.yaml
 *.sqlite
 *.sqlite3
 
+# Recent files tracking
+recent-files.json
+
 # Temporary files
 *.tmp
 *.temp
