@@ -37,18 +37,159 @@ export class CustomContextPadProvider {
   }
 
   applyColorToElement(element: any, color: string) {
-    this.modeling.setColor(element, {
-      fill: color,
-      stroke: 'black'
-    });
+    try {
+      // Check if this is a text annotation
+      if (element.type === 'bpmn:TextAnnotation') {
+        console.log('Applying color to text annotation:', element.id, color);
+        
+        // For text annotations, set stroke color
+        this.modeling.setColor(element, {
+          stroke: color
+        });
+        
+        // Also try to directly manipulate the SVG for better visibility
+        this.enhanceElementVisibility(element, color, 'stroke');
+        return;
+      }
+      
+      // Check if this is a group element
+      if (element.type === 'bpmn:Group') {
+        console.log('Applying color to group:', element.id, color);
+        
+        // For groups, set stroke color
+        this.modeling.setColor(element, {
+          stroke: color
+        });
+        
+        // Enhance visibility for groups
+        this.enhanceElementVisibility(element, color, 'stroke');
+        return;
+      }
+      
+      // For other elements, apply both fill and stroke
+      this.modeling.setColor(element, {
+        fill: color,
+        stroke: 'black'
+      });
+    } catch (error) {
+      console.warn('Unable to apply color to element:', element.type, error);
+      // Enhanced fallback for problematic elements
+      try {
+        // Try just setting stroke color
+        this.modeling.setColor(element, {
+          stroke: color
+        });
+        
+        // Try to enhance visibility
+        this.enhanceElementVisibility(element, color, 'stroke');
+      } catch (fallbackError) {
+        console.error('Failed to apply color to element:', element.type, fallbackError);
+      }
+    }
+  }
+
+  enhanceElementVisibility(element: any, color: string, type: 'stroke' | 'fill') {
+    try {
+      // Find the SVG element in the DOM
+      const elementId = element.id;
+      const svgElement = document.querySelector(`[data-element-id="${elementId}"]`);
+      
+      if (svgElement) {
+        if (element.type === 'bpmn:TextAnnotation') {
+          // For text annotations, only modify the existing visible border (left side)
+          // Don't add full border - just enhance the existing one
+          const visualElements = svgElement.querySelectorAll('path, polyline');
+          
+          visualElements.forEach((visual: any) => {
+            // Only modify if it's already visible (has stroke or stroke-width)
+            const currentStroke = visual.getAttribute('stroke') || visual.style.stroke;
+            const currentStrokeWidth = visual.getAttribute('stroke-width') || visual.style.strokeWidth;
+            
+            if (currentStroke && currentStroke !== 'none') {
+              visual.style.stroke = color;
+              visual.setAttribute('stroke', color);
+              // Slightly increase width for better visibility, but keep it subtle
+              if (currentStrokeWidth) {
+                const newWidth = Math.max(1.5, parseFloat(currentStrokeWidth) * 1.2);
+                visual.style.strokeWidth = newWidth + 'px';
+                visual.setAttribute('stroke-width', newWidth.toString());
+              }
+            }
+          });
+        } else {
+          // For other elements (like groups), apply full border styling
+          const visualElements = svgElement.querySelectorAll('path, rect, circle, ellipse, polygon, polyline');
+          
+          visualElements.forEach((visual: any) => {
+            if (type === 'stroke') {
+              visual.style.stroke = color;
+              visual.style.strokeWidth = element.type === 'bpmn:Group' ? '3px' : '2px';
+              visual.setAttribute('stroke', color);
+              visual.setAttribute('stroke-width', element.type === 'bpmn:Group' ? '3' : '2');
+              
+              // For groups, make them dashed for better visibility
+              if (element.type === 'bpmn:Group') {
+                visual.style.strokeDasharray = '5,5';
+                visual.setAttribute('stroke-dasharray', '5,5');
+              }
+            } else {
+              visual.style.fill = color;
+              visual.setAttribute('fill', color);
+            }
+          });
+        }
+        
+        console.log(`Enhanced visibility for ${element.type} with ${type}: ${color}`);
+      } else {
+        console.log(`Could not find SVG element for ${elementId}`);
+      }
+    } catch (error) {
+      console.log('Could not enhance element visibility:', error);
+    }
   }
 
   getContextPadEntries(element: any) {
+    // Only show color picker for elements that support coloring
+    const colorableElements = [
+      'bpmn:Task',
+      'bpmn:UserTask',
+      'bpmn:ServiceTask',
+      'bpmn:ScriptTask',
+      'bpmn:BusinessRuleTask',
+      'bpmn:SendTask',
+      'bpmn:ReceiveTask',
+      'bpmn:ManualTask',
+      'bpmn:CallActivity',
+      'bpmn:SubProcess',
+      'bpmn:StartEvent',
+      'bpmn:EndEvent',
+      'bpmn:IntermediateThrowEvent',
+      'bpmn:IntermediateCatchEvent',
+      'bpmn:BoundaryEvent',
+      'bpmn:Gateway',
+      'bpmn:ExclusiveGateway',
+      'bpmn:InclusiveGateway',
+      'bpmn:ParallelGateway',
+      'bpmn:EventBasedGateway',
+      'bpmn:ComplexGateway',
+      'bpmn:DataObjectReference',
+      'bpmn:DataStoreReference',
+      'bpmn:Participant',
+      'bpmn:Lane',
+      'bpmn:TextAnnotation',
+      'bpmn:Group'
+    ];
+
+    // Check if the current element supports coloring
+    if (!colorableElements.includes(element.type)) {
+      return {};
+    }
+
     return {
       'color-picker': {
         group: 'edit', // which group (edit, model, etc.)
         className: 'bpmn-icon-color', // icon class name
-        title: 'Color Element', //this.translate('Color Element'),
+        title: 'Fill Color', //this.translate('Fill Color'),
         html: `<div class="entry">${colorPickerSvg}</div>`,
         action: {
           click: (event: any, element: any) => {
@@ -68,7 +209,7 @@ export class CustomContextPadProvider {
 
     // Define your 8 specific colors
     const colors = [
-      '#FFB6C1', '#FFFFC5', '#DAF7A6', '#f4a677',
+      '#f15b71ff', '#FFFFC5', '#DAF7A6', '#f4a677',
       '#b1d4e0', '#f0e3fe', '#b8f3d4', '#FFFFFF'
     ];
 
@@ -77,7 +218,7 @@ export class CustomContextPadProvider {
 
     panel.style.position = 'absolute';
     const rect = anchorEl.getBoundingClientRect();
-    panel.style.top = rect.bottom + 5 + 'px'; // 5px below
+    panel.style.top = rect.bottom + 5 + 'px';
     panel.style.left = rect.left + 'px';
     panel.style.background = '#fff';
     panel.style.border = '1px solid #ccc';
