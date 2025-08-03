@@ -46,3 +46,17 @@
   border-right: 1px solid #bbb
 }
 
+.control button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  color: #ccc;
+}
+
+.control button:disabled:hover {
+  background: none;
+}
+
+.control:has(button:disabled):hover {
+  background-color: transparent;
+}
+

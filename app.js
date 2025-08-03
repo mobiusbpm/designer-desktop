@@ -276,19 +276,19 @@ function getMenuTemplate() {
     {
       label: 'Help',
       submenu: [
-        {
-          label: 'Documentation',
-          click: () => {
-            mainWindow.webContents.send('menu-action', 'documentation');
-          },
-        },
-        {
-          label: 'Report Issue',
-          click: () => {
-            mainWindow.webContents.send('menu-action', 'reportIssue');
-          },
-        },
-        {type: 'separator'},
+        // {
+        //   label: 'Documentation',
+        //   click: () => {
+        //     mainWindow.webContents.send('menu-action', 'documentation');
+        //   },
+        // },
+        // {
+        //   label: 'Report Issue',
+        //   click: () => {
+        //     mainWindow.webContents.send('menu-action', 'reportIssue');
+        //   },
+        // },
+        // {type: 'separator'},
         {
           role: 'about', label: `About ${app.name}`,
           click: () => {

@@ -15,19 +15,6 @@
     (onPublish)="handlePublish()">
   </app-edit-tools>
   <div class="breadcrumb-container">
-<!--    <div class="breadcrumb-wrapper">-->
-<!--      <nz-breadcrumb>-->
-<!--        <nz-breadcrumb-item *ngFor="let crumb of breadcrumbs">-->
-<!--          <a>{{ crumb }}</a>-->
-<!--        </nz-breadcrumb-item>-->
-<!--      </nz-breadcrumb>-->
-<!--    </div>-->
-    <!-- <div class="file-path" *ngIf="filePath!=null">
-      <span [ngStyle]="{ 'font-weight': isFileChanged ? 'bold' : 'normal' }">
-        {{ getFileName() }}
-      </span>
-      <span style="color: red; font-weight: bold" *ngIf="isFileChanged">*</span>
-    </div> -->
   </div>
 </div>
 
@@ -37,12 +24,11 @@
   <div id="js-properties-panel" class="properties-panel">
     <div class="drag-handle">
       <button class="drawer-button" nz-button *ngIf="!isExpanded" (click)="togglePanel()">
-        <span nz-icon nzType="right-circle" nzTheme="fill"></span>
+        <span>&gt;</span>
       </button>
       <button class="drawer-button" nz-button *ngIf="isExpanded" (click)="togglePanel()">
-        <span nz-icon nzType="left-circle" nzTheme="fill"></span>
+        <span>&lt;</span>
       </button>
     </div>
   </div>
-  <nz-spin nzTip="Publishing..." [nzSpinning]="isPublishing" [nzSize]="'large'" class="centered-spinner"></nz-spin>
 </div>
